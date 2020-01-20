@@ -3,10 +3,13 @@
   width: 400px;
   height: 400px;
   border: 1px solid black;
+  table-layout: fixed;
 }
+
 
 td {
   border: 1px solid green;
+  text-align: center;
 }
 
 td.bomb {

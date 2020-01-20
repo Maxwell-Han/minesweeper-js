@@ -19,3 +19,42 @@ document.getElementById("board").append(table);
 
 const game = new Minesweeper(width, height)
 
+document.getElementById("board").addEventListener("click", event => {
+  if(event.target.tagName === 'TD') {
+    const row = event.target.dataset.row
+    const col = event.target.dataset.col
+    const val = game.getTile(row, col)
+    event.target.innerText = val
+    const lastBoard = JSON.parse(JSON.stringify(game.board))
+    game.flipTile(row, col)
+    console.log(lastBoard)
+    console.log('new board!', game.board)
+    lastBoard.forEach( (row, r) => {
+      row.forEach( (col, c) => {
+        const lastVal = lastBoard[r][c]
+        const newVal = game.getTile(r, c)
+        console.log(lastVal, newVal)
+        if(lastVal !== newVal && newVal !== 'B') {
+          //get td based on row and col
+          const targetTD = queryTD(r, c)
+          console.log('changing the td html! ', targetTD)
+          //reveal the td element
+          const tdVal = game.getTile(r, c)
+          targetTD.innerText = tdVal
+          targetTD.classList.add(tdVal)
+        }
+      })
+    })
+  }
+})
+
+const queryTD = (row, col) => {
+  const tdList = Array.from(document.querySelectorAll('td'))
+  const foundTD = tdList.filter( el => {
+    if(Number(el.dataset.row) == row && Number(el.dataset.col) == col) {
+      return el
+    }
+  })[0]
+  return foundTD
+}
+
