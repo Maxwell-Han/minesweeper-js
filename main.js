@@ -24,23 +24,22 @@ document.getElementById("board").addEventListener("click", event => {
     const row = event.target.dataset.row
     const col = event.target.dataset.col
     const val = game.getTile(row, col)
-    event.target.innerText = val
+    if(val !== 0 && val !== 'E') event.target.innerText = val
+    // update tiles for neighbors
     const lastBoard = JSON.parse(JSON.stringify(game.board))
     game.flipTile(row, col)
-    console.log(lastBoard)
-    console.log('new board!', game.board)
     lastBoard.forEach( (row, r) => {
       row.forEach( (col, c) => {
         const lastVal = lastBoard[r][c]
         const newVal = game.getTile(r, c)
-        console.log(lastVal, newVal)
         if(lastVal !== newVal && newVal !== 'B') {
           //get td based on row and col
           const targetTD = queryTD(r, c)
-          console.log('changing the td html! ', targetTD)
           //reveal the td element
           const tdVal = game.getTile(r, c)
-          targetTD.innerText = tdVal
+          if(tdVal !== 0 && tdVal !== 'E') {
+            targetTD.innerText = tdVal
+          }
           targetTD.classList.add(tdVal)
         }
       })
