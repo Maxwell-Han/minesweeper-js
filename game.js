@@ -35,6 +35,7 @@ class Minesweeper {
       if(this.getTile(row, col) && this.getTile(row, col) !== 'B') {
         this.setTile('B', row, col)
         i++
+        console.log('we should have ', i, ' bombs by now')
       }
     }
   }
@@ -43,11 +44,13 @@ class Minesweeper {
     // check if bombed.  check neighboring bomb count
     if(this.isBombed(row, col)) {
       // player chose a bomb and game ends
+      return
     }else {
       this.setTile(0, row, col)
     }
     this.revealSurroundingTiles(row, col)
   }
+
   isBombed(row, col) {
     return this.getTile(row, col) === 'B'
   }

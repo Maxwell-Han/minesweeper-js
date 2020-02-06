@@ -18,16 +18,28 @@ for (let h = 0; h < height; h++) {
 document.getElementById("board").append(table);
 
 const game = new Minesweeper(width, height)
+game.seedBoard()
+console.log(game.board)
 
 document.getElementById("board").addEventListener("click", event => {
   if(event.target.tagName === 'TD') {
     const row = event.target.dataset.row
     const col = event.target.dataset.col
     const val = game.getTile(row, col)
+    const currentTileVal = game.getTile(row, col)
+    if(currentTileVal !== 'E' && currentTileVal !== 'B') return
+    if(currentTileVal === 'B') {
+      console.log('WE GOT BOMBED')
+      console.log(event.target)
+      event.target.classList.add('tile-bomb')
+      // add logic to show all bombs and end game
+      return
+    }
     if(val !== 0 && val !== 'E') event.target.innerText = val
     // update tiles for neighbors
     const lastBoard = JSON.parse(JSON.stringify(game.board))
     game.flipTile(row, col)
+
     lastBoard.forEach( (row, r) => {
       row.forEach( (col, c) => {
         const lastVal = lastBoard[r][c]
@@ -40,7 +52,7 @@ document.getElementById("board").addEventListener("click", event => {
           if(tdVal !== 0 && tdVal !== 'E') {
             targetTD.innerText = tdVal
           }
-          targetTD.classList.add(tdVal)
+          targetTD.classList.toggle(getTileClass(tdVal))
         }
       })
     })
@@ -57,3 +69,12 @@ const queryTD = (row, col) => {
   return foundTD
 }
 
+const getTileClass = (val) => {
+  if(val === 0 || val === 'E') {
+    return 'tile-clear'
+  } else if(typeof Number(val) === 'number') {
+    return 'tile-count'
+  } else {
+    return 'tile-bomb'
+  }
+}
