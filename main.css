@@ -49,3 +49,7 @@ td.tile-clear {
 td.flag {f
 
 }
+
+td.tile-count {
+  background-color: red;;
+}

@@ -1,98 +1,135 @@
+class Tile {
+  constructor(game, coords, val) {
+    this.game = game;
+    this.coords = coords;
+    this.val = val;
+    this.revealed = false;
+  }
+  // click will grab tile from board[row][col] and tile will call .flipTile
+  getNeighbors() {
+    const neighbors = [];
+    let rowIdx = this.coords[0];
+    let colIdx = this.coords[1];
+    for (let r = rowIdx - 1; r <= rowIdx + 1; r++) {
+      if (r < 0 || r >= this.game.height) continue;
+      for (let c = colIdx - 1; c <= colIdx + 1; c++) {
+        if (c < 0 || c >= this.game.width) continue;
+        if (r === rowIdx && c === colIdx) continue;
+        if (!!this.game.board[r][c]) {
+          neighbors.push(this.game.board[r][c]);
+        }
+      }
+    }
+
+    return neighbors;
+  }
+  flipTile() {
+    if (this.val === "B") return;
+    if (this.val !== "E") return;
+    // mark tile as flipped
+    this.revealed = true;
+    let neighbors = this.getNeighbors();
+    let bombCount = neighbors.filter(tile => tile.val === "B").length;
+    if (bombCount > 0) {
+      this.val = bombCount;
+      return;
+    } else {
+      this.val = 0;
+    }
+
+    neighbors.forEach(tile => {
+      // console.log('Tile coords is ', tile.coords)
+      tile.flipTile();
+    });
+  }
+}
 
 class Minesweeper {
-  constructor(width, height) {
-    this.width = width
-    this.height = height
-    this.board = this.makeBoard()
-    this.bombCount = 10
+  constructor(width = 9, height = 9, bombCount = 10) {
+    this.width = width;
+    this.height = height;
+    this.board = this.makeBoard();
+    this.bombCount = bombCount;
+    this.gameOver = false;
   }
   makeBoard() {
-    let board = []
-    for(let i = 0; i < this.height; i++) {
-      let row = []
-      for(let j = 0; j < this.width; j++) {
-        row.push('E')
+    let board = [];
+    for (let r = 0; r < this.height; r++) {
+      let row = [];
+      for (let c = 0; c < this.width; c++) {
+        let tile = new Tile(this, [r, c], "E");
+        row.push(tile);
       }
-      board.push(row)
+      board.push(row);
     }
-    return board
-  }
-  getTile(row, col) {
-    if(row < 0 || col < 0) return false
-    if(row >= this.height || col >= this.width) return false
-    return this.board[row][col]
-  }
-  setTile(value, row, col) {
-    if(this.getTile(row, col)) {
-      this.board[row][col] = value
-    }
-  }
-  seedBoard() {
-    let i  = 0
-    while(i < this.bombCount) {
-      let row = Math.floor(Math.random() * this.height)
-      let col = Math.floor(Math.random() * this.width)
-      if(this.getTile(row, col) && this.getTile(row, col) !== 'B') {
-        this.setTile('B', row, col)
-        i++
-        console.log('we should have ', i, ' bombs by now')
-      }
-    }
-  }
-  flipTile(row, col) {
-    if(!this.getTile) return
-    // check if bombed.  check neighboring bomb count
-    if(this.isBombed(row, col)) {
-      // player chose a bomb and game ends
-      return
-    }else {
-      this.setTile(0, row, col)
-    }
-    this.revealSurroundingTiles(row, col)
+    return board;
   }
 
-  isBombed(row, col) {
-    return this.getTile(row, col) === 'B'
-  }
-  getSurroundingBombCount(row, col) {
-    let bombCount = 0
-    for(let offsetX = row - 1; offsetX < row + 2; offsetX++) {
-      for(let offsetY = col - 1; offsetY < col + 2; offsetY++) {
-        if(offsetX === row && offsetY === col) continue
-        if(this.getTile(offsetX, offsetY) === 'B') bombCount++
+  seedBoard() {
+    let i = 0;
+    while (i < this.bombCount) {
+      let row = Math.floor(Math.random() * this.height);
+      let col = Math.floor(Math.random() * this.width);
+      if (this.board[row][col] && this.board[row][col] !== "B") {
+        this.board[row][col].val = "B";
+        i++;
       }
     }
-    return bombCount
   }
-  getSurroundingTiles(row, col) {
-    const positions = []
-    for(let offsetX = row - 1; offsetX < row + 2; offsetX++) {
-      for(let offsetY = col - 1; offsetY < col + 2; offsetY++) {
-        if(offsetX === row && offsetY === col) continue
-        positions.push([offsetX, offsetY])
-      }
-    }
-    return positions
+  getClearedTileCount() {
+    const flippedTiles = this.board.reduce((accum, row) => {
+      let flipped = row.filter(tile => {
+        return tile.revealed;
+      }).length;
+      return accum + flipped;
+    }, 0);
+    return flippedTiles;
   }
-  revealSurroundingTiles(row, col) {
-    //for each of a tiles neighbors, see if they are clear or have a bomb
-    //if they are clear, check that tiles neighbors otherwise leave empty
-    //if a bomb or show number of neighboring bombs
-    let neighbors = this.getSurroundingTiles(row, col)
-    neighbors.forEach( tilePos => {
-      let tileRow = tilePos[0]
-      let tileCol = tilePos[1]
-      if(this.getTile(tileRow, tileCol) )helper.call(this, tileRow, tileCol)
-    })
-    function helper(row, col) {
-      if(this.isBombed(row, col)) return
-      let bombCount = this.getSurroundingBombCount(row, col)
-      if(bombCount > 0) {
-        this.setTile(bombCount, row, col) // set tile to show count
-        return
-      } else {
-        this.flipTile(row, col)
-      }
+
+  getBombCount() {
+  const bombs = this.board.reduce((accum, row) => {
+    let flipped = row.filter(tile => {
+      return tile.val == 'B';
+    }).length;
+    return accum + flipped;
+  }, 0);
+  return bombs;
+}
+
+  processMove(row, col) {
+    let tile = this.board[row][col];
+    if (tile.val === "B") {
+      this.gameOver = true;
+      this.board = this.revealGameOver();
     }
+  }
+
+  reveal() {
+    return this.board.map(row => {
+      return row.map(tile => {
+        return tile.val;
+      });
+    });
+  }
+
+  revealGameOver() {
+    return this.board.map(row => {
+      return row.map(tile => {
+        if (tile.val === "B") {
+          return "B";
+        } else {
+          return "E";
+        }
+      });
+    });
+  }
+
+  cheat() {
+    return this.board.map(row => {
+      return row.map(tile => {
+        if (tile.val === "B") return "B";
+        else return "";
+      });
+    });
   }
 }
