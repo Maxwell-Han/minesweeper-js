@@ -30,16 +30,7 @@ document.getElementById("board").addEventListener("click", event => {
   const currentTileVal = game.board[row][col].val;
   // console.log('clicked tile is ', currentTileVal);
 
-  // const lastBoard = JSON.parse(JSON.stringify(game.board))
-  const lastBoard = []
-  game.board.forEach(row => {
-    let tempRow = []
-    row.forEach(tile => {
-      let copy = {...tile}
-      tempRow.push(copy)
-    });
-    lastBoard.push(tempRow)
-  });
+  const lastBoard = game.getCopyBoard()
 
   // flip tile and check neighbors recursively
   game.board[row][col].flipTile();

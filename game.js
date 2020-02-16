@@ -38,7 +38,6 @@ class Tile {
     }
 
     neighbors.forEach(tile => {
-      // console.log('Tile coords is ', tile.coords)
       tile.flipTile();
     });
   }
@@ -110,6 +109,31 @@ class Minesweeper {
         return tile.val;
       });
     });
+  }
+
+  peek() {
+    return this.board.map(row => {
+      return row.map(tile => {
+        if(tile.val === 'B') {
+          return tile.val
+        } else {
+          return ''
+        }
+      });
+    });
+  }
+
+  getCopyBoard() {
+    const lastBoard = []
+    this.board.forEach(row => {
+      let tempRow = []
+      row.forEach(cell => {
+        let copy = {...cell}
+        tempRow.push(copy)
+      })
+      lastBoard.push(tempRow)
+    })
+    return lastBoard
   }
 
   revealGameOver() {
