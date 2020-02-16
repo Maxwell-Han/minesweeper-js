@@ -20,6 +20,14 @@
   padding: 0 15px 0 15px;
 }
 
+#win {
+  display: none;
+}
+
+#game-over {
+  display: none;
+}
+
 td {
   border: 1px solid black;
   text-align: center;

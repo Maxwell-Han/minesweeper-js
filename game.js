@@ -75,17 +75,6 @@ class Minesweeper {
     }
   }
 
-
-  getClearedTileCount() {
-    const flippedTiles = this.board.reduce((accum, row) => {
-      let flipped = row.filter(tile => {
-        return tile.revealed;
-      }).length;
-      return accum + flipped;
-    }, 0);
-    return flippedTiles;
-  }
-
   getBombCount() {
     const bombs = this.board.reduce((accum, row) => {
       let flipped = row.filter(tile => {

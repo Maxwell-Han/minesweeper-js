@@ -1,5 +1,8 @@
 const width = 9;
 const height = 9;
+const newGame = document.getElementById('new-game')
+const gameWonDisplay = document.getElementById('win')
+const gameOverDisplay = document.getElementById('game-over')
 
 const tds = [];
 
@@ -36,18 +39,6 @@ document.getElementById("board").addEventListener("click", event => {
   game.board[row][col].flipTile();
   // console.log('flipped a tile')
 
-  // update class names for styling board
-  // game.board.forEach( (row, r) => {
-  //   row.forEach( (col, c) => {
-  //     const tile = game.board[r][c]
-  //     if(tile.val != 'E' && tile.val != 'B') {
-  //       console.log('rendering tile')
-  //       const targetTD = queryTD(r, c)
-  //       targetTD.classList.toggle(getTileClass(tile.val))
-  //     }
-  //   })
-  // })
-
   lastBoard.forEach((row, r) => {
     row.forEach((col, c) => {
       const lastVal = lastBoard[r][c].val
@@ -75,6 +66,10 @@ document.getElementById("board").addEventListener("click", event => {
 
   // check current tile for bomb before running flipTile logic
   game.processMove(row, col);
+  if(game.checkGameWon()) {
+    newGame.style.display = 'none'
+    gameWonDisplay.style.display = 'block'
+  }
   if (game.gameOver) {
     console.log("WE GOT BOMBED: GAME OVER");
     event.target.classList.add("tile-bomb");
