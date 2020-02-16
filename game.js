@@ -65,16 +65,17 @@ class Minesweeper {
   }
 
   seedBoard() {
-    let i = 0;
-    while (i < this.bombCount) {
+    while (this.getBombCount() < this.bombCount) {
       let row = Math.floor(Math.random() * this.height);
       let col = Math.floor(Math.random() * this.width);
-      if (this.board[row][col] && this.board[row][col] !== "B") {
+      if(this.board[row][col] === "B") continue
+      if (this.board[row][col]) {
         this.board[row][col].val = "B";
-        i++;
       }
     }
   }
+
+
   getClearedTileCount() {
     const flippedTiles = this.board.reduce((accum, row) => {
       let flipped = row.filter(tile => {
@@ -86,14 +87,14 @@ class Minesweeper {
   }
 
   getBombCount() {
-  const bombs = this.board.reduce((accum, row) => {
-    let flipped = row.filter(tile => {
-      return tile.val == 'B';
-    }).length;
-    return accum + flipped;
-  }, 0);
-  return bombs;
-}
+    const bombs = this.board.reduce((accum, row) => {
+      let flipped = row.filter(tile => {
+        return tile.val == "B";
+      }).length;
+      return accum + flipped;
+    }, 0);
+    return bombs;
+  }
 
   processMove(row, col) {
     let tile = this.board[row][col];
@@ -114,26 +115,26 @@ class Minesweeper {
   peek() {
     return this.board.map(row => {
       return row.map(tile => {
-        if(tile.val === 'B') {
-          return tile.val
+        if (tile.val === "B") {
+          return tile.val;
         } else {
-          return ''
+          return "";
         }
       });
     });
   }
 
   getCopyBoard() {
-    const lastBoard = []
+    const lastBoard = [];
     this.board.forEach(row => {
-      let tempRow = []
+      let tempRow = [];
       row.forEach(cell => {
-        let copy = {...cell}
-        tempRow.push(copy)
-      })
-      lastBoard.push(tempRow)
-    })
-    return lastBoard
+        let copy = { ...cell };
+        tempRow.push(copy);
+      });
+      lastBoard.push(tempRow);
+    });
+    return lastBoard;
   }
 
   revealGameOver() {
@@ -148,12 +149,18 @@ class Minesweeper {
     });
   }
 
-  cheat() {
-    return this.board.map(row => {
-      return row.map(tile => {
-        if (tile.val === "B") return "B";
-        else return "";
-      });
-    });
+  getRevealedCount() {
+    const revealed = this.board.reduce((count, row) => {
+      const rowCount = row.filter(tile => tile.revealed).length;
+      count += rowCount;
+      return count;
+    }, 0);
+    return revealed;
+  }
+
+  checkGameWon() {
+    return (
+      this.width * this.height - this.bombCount === this.getRevealedCount()
+    );
   }
 }

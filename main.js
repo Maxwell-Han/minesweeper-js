@@ -68,7 +68,6 @@ document.getElementById("board").addEventListener("click", event => {
         targetTD.classList.toggle(getTileClass(tdVal));
       }
     });
-    console.log(game.reveal())
   });
 
   // don't process move if tile already flipped
